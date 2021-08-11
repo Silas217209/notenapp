@@ -47,6 +47,7 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   late Box lessons;
   bool _add = false;
+  final _formKey = GlobalKey<FormState>();
   @override
   void initState() {
     super.initState();
@@ -63,11 +64,57 @@ class _MyHomePageState extends State<MyHomePage> {
       body: ListView.builder(
         itemCount: lessons.length,
           itemBuilder: (BuildContext context, index) {
-            return Card(
+            return lessons.getAt(index).isNotEmpty ? Card(
               child: Row(
                 children: [
                   Text('${lessons.keys.toList()[index]}'),
                   getmean(lessons.getAt(index)),
+                ],
+              ),
+            ) : Card(
+              child: Column(
+                children: [
+                  Form(
+                    key: _formKey,
+                    child: TextFormField(
+                      keyboardType: TextInputType.text,
+                      autocorrect: false,
+                      decoration: InputDecoration(
+                        labelText: 'Fach',
+                        border: OutlineInputBorder(),
+                      ),
+                      validator: (value) {
+                        if(value!.isEmpty) {
+                          return 'Gib bitte das Fach an';
+                        }
+                        return null;
+                      },
+                    ),
+                  ),
+                  Row(
+                    children: [
+                      TextButton(
+                          onPressed: () {
+                            lessons.delete('${lessons.length - 1}');
+                            setState(() {
+                              lessons = Hive.box('lessons');
+                            });
+                          },
+                          child: Text('Abbrechen')
+                      ),
+                      TextButton(
+                          onPressed: () {
+                            if (_formKey.currentState!.validate()) {
+                              lessons.getAt(index).put('name' ,'${_formKey.currentState.toString()}');
+                              setState(() {
+                                lessons = Hive.box('lessons');
+                              });
+                            }
+                          },
+                          child: Text('OK')
+                      ),
+                    ],
+                  ),
                 ],
               ),
             );
@@ -75,7 +122,9 @@ class _MyHomePageState extends State<MyHomePage> {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
+          lessons.put('${lessons.length}', {});
           setState(() {
+            lessons = Hive.box('lessons');
             _add = true;
           });
         },
