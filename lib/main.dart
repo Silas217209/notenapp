@@ -60,22 +60,18 @@ class _MyHomePageState extends State<MyHomePage> {
       appBar: AppBar(
         title: Text(widget.title),
       ),
-      body: Column(
-        children: [
-          addlesson(context),
-          ListView.builder(
-              itemBuilder: (BuildContext context, index) {
-                return Card(
-                  child: Row(
-                    children: [
-                      Text('${lessons.keys.toList()[index]}'),
-                      getmean(lessons.getAt(index)),
-                    ],
-                  ),
-                );
-              },
-          ),
-        ],
+      body: ListView.builder(
+        itemCount: lessons.length,
+          itemBuilder: (BuildContext context, index) {
+            return Card(
+              child: Row(
+                children: [
+                  Text('${lessons.keys.toList()[index]}'),
+                  getmean(lessons.getAt(index)),
+                ],
+              ),
+            );
+          },
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
@@ -133,7 +129,7 @@ class _MyHomePageState extends State<MyHomePage> {
           ],
         );
       },
-    ) : null;
+    ) : SizedBox();
   }
   Text getmean(Map lesson) {
     if(lesson.isEmpty) {
